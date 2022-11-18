@@ -1,10 +1,21 @@
 import collections
-import inflection
 import itertools
 import json
 import re
 
+import inflection
 
+SHOULD_INFLECT = True 
+
+def inflect_column_name(name):
+    if SHOULD_INFLECT:
+        name = re.sub(r"([A-Z]+)_([A-Z][a-z])", r'\1__\2', name)
+        name = re.sub(r"([a-z\d])_([A-Z])", r'\1__\2', name)
+        return inflection.underscore(name)
+    else:
+        return name
+    
+    
 def flatten_key(k, parent_key, sep):
     """
 
@@ -16,7 +27,7 @@ def flatten_key(k, parent_key, sep):
     Returns:
     """
     full_key = parent_key + [k]
-    inflected_key = full_key.copy()
+    inflected_key = [inflect_column_name(n) for n in full_key]
     reducer_index = 0
     while len(sep.join(inflected_key)) >= 255 and reducer_index < len(inflected_key):
         reduced_key = re.sub(r'[a-z]', '', inflection.camelize(inflected_key[reducer_index]))

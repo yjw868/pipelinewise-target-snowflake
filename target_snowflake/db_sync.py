@@ -128,7 +128,7 @@ def column_clause(name, schema_property):
 
 def primary_column_names(stream_schema_message):
     """Generate list of SQL friendly PK column names"""
-    return [safe_column_name(p) for p in stream_schema_message['key_properties']]
+    return [safe_column_name(flattening.inflect_column_name(p)) for p in stream_schema_message['key_properties']]
 
 
 # pylint: disable=invalid-name
@@ -199,6 +199,9 @@ class DbSync:
         # Validate connection configuration
         config_errors = validate_config(connection_config)
 
+        global SHOULD_INFLECT
+        SHOULD_INFLECT = bool(self.connection_config.get('underscore_camel_case_fields')
+        
         # Exit if config has errors
         if len(config_errors) > 0:
             self.logger.error('Invalid configuration:\n   * %s', '\n   * '.join(config_errors))
@@ -378,6 +381,7 @@ class DbSync:
 
         key_props = []
         for key_prop in self.stream_schema_message['key_properties']:
+            key_prop = flattening.inflect_column_name(key_prop)
             if key_prop not in flatten or flatten[key_prop] is None:
                 raise PrimaryKeyNotFoundException(
                     f"Primary key '{key_prop}' does not exist in record or is null. "
