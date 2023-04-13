@@ -199,8 +199,8 @@ class DbSync:
         # Validate connection configuration
         config_errors = validate_config(connection_config)
 
-        global SHOULD_INFLECT
-        SHOULD_INFLECT = bool(self.connection_config.get('underscore_camel_case_fields')
+        # global SHOULD_INFLECT
+        # SHOULD_INFLECT = bool(self.connection_config.get('underscore_camel_case_fields'))
         
         # Exit if config has errors
         if len(config_errors) > 0:
